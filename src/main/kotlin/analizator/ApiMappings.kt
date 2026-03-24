@@ -7,6 +7,7 @@ import analizator.dto.SequenceStatsDto
 
 fun SequenceReport.toDto(): AnalyzeResponseDto {
     return AnalyzeResponseDto(
+        experimentId = requireNotNull(experimentId) { "experimentId не должен быть null" },
         header = header,
         sequence = sequence,
         stats = SequenceStatsDto(
