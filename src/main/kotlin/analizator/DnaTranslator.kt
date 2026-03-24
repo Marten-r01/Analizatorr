@@ -6,17 +6,14 @@ class DnaTranslator {
         "TCT" to "S", "TCC" to "S", "TCA" to "S", "TCG" to "S",
         "TAT" to "Y", "TAC" to "Y", "TAA" to "*", "TAG" to "*",
         "TGT" to "C", "TGC" to "C", "TGA" to "*", "TGG" to "W",
-
         "CTT" to "L", "CTC" to "L", "CTA" to "L", "CTG" to "L",
         "CCT" to "P", "CCC" to "P", "CCA" to "P", "CCG" to "P",
         "CAT" to "H", "CAC" to "H", "CAA" to "Q", "CAG" to "Q",
         "CGT" to "R", "CGC" to "R", "CGA" to "R", "CGG" to "R",
-
         "ATT" to "I", "ATC" to "I", "ATA" to "I", "ATG" to "M",
         "ACT" to "T", "ACC" to "T", "ACA" to "T", "ACG" to "T",
         "AAT" to "N", "AAC" to "N", "AAA" to "K", "AAG" to "K",
         "AGT" to "S", "AGC" to "S", "AGA" to "R", "AGG" to "R",
-
         "GTT" to "V", "GTC" to "V", "GTA" to "V", "GTG" to "V",
         "GCT" to "A", "GCC" to "A", "GCA" to "A", "GCG" to "A",
         "GAT" to "D", "GAC" to "D", "GAA" to "E", "GAG" to "E",
