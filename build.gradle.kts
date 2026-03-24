@@ -27,6 +27,7 @@ dependencies {
 
     testImplementation(kotlin("test-junit5"))
     testImplementation("io.ktor:ktor-server-test-host-jvm:$ktorVersion")
+    testImplementation("io.ktor:ktor-client-core-jvm:$ktorVersion")
     testRuntimeOnly("com.h2database:h2:$h2Version")
 }
 
