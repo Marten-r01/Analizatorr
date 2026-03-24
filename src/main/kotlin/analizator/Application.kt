@@ -3,14 +3,18 @@ package analizator
 import analizator.dto.AnalyzeRequestDto
 import analizator.dto.ErrorResponseDto
 import analizator.dto.HealthResponseDto
+import analizator.dto.UploadConfigResponseDto
+import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.call
+import io.ktor.server.application.install
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.statuspages.StatusPages
+import io.ktor.server.request.contentType
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.get
@@ -18,6 +22,7 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import kotlinx.serialization.json.Json
+import java.io.IOException
 
 fun main() {
     embeddedServer(
@@ -37,6 +42,10 @@ fun Application.module(repository: AnalysisRepository = createProductionReposito
         repository = repository
     )
 
+    val multipartFastaExtractor = MultipartFastaExtractor(
+        maxFileSizeBytes = UploadConstraints.MAX_FASTA_SIZE_BYTES
+    )
+
     install(ContentNegotiation) {
         json(
             Json {
@@ -54,6 +63,15 @@ fun Application.module(repository: AnalysisRepository = createProductionReposito
             )
         }
 
+        exception<IOException> { call, _ ->
+            call.respond(
+                HttpStatusCode.PayloadTooLarge,
+                ErrorResponseDto(
+                    message = "Размер загружаемого FASTA-файла превышает ${UploadConstraints.MAX_FASTA_SIZE_MB} МБ"
+                )
+            )
+        }
+
         exception<Throwable> { call, cause ->
             call.respond(
                 HttpStatusCode.InternalServerError,
@@ -68,12 +86,37 @@ fun Application.module(repository: AnalysisRepository = createProductionReposito
         }
 
         route("/api/v1") {
+            get("/upload-config") {
+                call.respond(
+                    UploadConfigResponseDto(
+                        maxFileSizeBytes = UploadConstraints.MAX_FASTA_SIZE_BYTES,
+                        maxFileSizeMb = UploadConstraints.MAX_FASTA_SIZE_MB,
+                        fileFieldName = UploadConstraints.FILE_FIELD_NAME,
+                        acceptedRequestContentType = ContentType.MultiPart.FormData.toString()
+                    )
+                )
+            }
+
             post("/analyze") {
                 val request = call.receive<AnalyzeRequestDto>()
                 val report = analysisService.analyzeAndSave(
                     lines = request.fastaContent.lineSequence().toList(),
                     originalFileName = request.originalFileName
                 )
+                call.respond(report.toDto())
+            }
+
+            post("/analyze-upload") {
+                require(call.request.contentType().match(ContentType.MultiPart.FormData)) {
+                    "Ожидается Content-Type: multipart/form-data"
+                }
+
+                val uploadedFasta = multipartFastaExtractor.extract(call)
+                val report = analysisService.analyzeAndSave(
+                    lines = uploadedFasta.content.lineSequence().toList(),
+                    originalFileName = uploadedFasta.originalFileName
+                )
+
                 call.respond(report.toDto())
             }
 
