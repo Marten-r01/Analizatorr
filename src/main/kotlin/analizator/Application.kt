@@ -28,12 +28,13 @@ fun main() {
     ).start(wait = true)
 }
 
-fun Application.module() {
+fun Application.module(repository: AnalysisRepository = createProductionRepository()) {
     val analysisService = SequenceAnalysisService(
         parser = FastaParser(FastaValidator()),
         gcAnalyzer = GcAnalyzer(),
         orfFinder = OrfFinder(),
-        dnaTranslator = DnaTranslator()
+        dnaTranslator = DnaTranslator(),
+        repository = repository
     )
 
     install(ContentNegotiation) {
@@ -69,9 +70,44 @@ fun Application.module() {
         route("/api/v1") {
             post("/analyze") {
                 val request = call.receive<AnalyzeRequestDto>()
-                val report = analysisService.analyze(request.fastaContent.lineSequence().toList())
+                val report = analysisService.analyzeAndSave(
+                    lines = request.fastaContent.lineSequence().toList(),
+                    originalFileName = request.originalFileName
+                )
                 call.respond(report.toDto())
+            }
+
+            get("/analysis/{id}") {
+                val id = call.parameters["id"]?.toIntOrNull()
+                    ?: throw IllegalArgumentException("Некорректный id анализа")
+
+                val report = analysisService.getByExperimentId(id)
+                if (report == null) {
+                    call.respond(
+                        HttpStatusCode.NotFound,
+                        ErrorResponseDto(message = "Анализ не найден")
+                    )
+                } else {
+                    call.respond(report.toDto())
+                }
             }
         }
     }
+}
+
+private fun createProductionRepository(): AnalysisRepository {
+    val dbUrl = System.getenv("DB_URL") ?: "jdbc:postgresql://localhost:5432/analizator"
+    val dbUser = System.getenv("DB_USER") ?: "postgres"
+    val dbPassword = System.getenv("DB_PASSWORD") ?: "postgres"
+    val dbDriver = System.getenv("DB_DRIVER") ?: "org.postgresql.Driver"
+
+    DatabaseFactory.connect(
+        url = dbUrl,
+        driver = dbDriver,
+        user = dbUser,
+        password = dbPassword
+    )
+    DatabaseFactory.createSchema()
+
+    return ExposedAnalysisRepository()
 }
