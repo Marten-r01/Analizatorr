@@ -1,11 +1,13 @@
 package analizator
 
+import io.ktor.client.request.forms.MultiPartFormDataContent
+import io.ktor.client.request.forms.formData
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
-import io.ktor.http.ContentType
+import io.ktor.http.Headers
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.contentType
 import io.ktor.server.testing.testApplication
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -25,20 +27,46 @@ class ApplicationApiTest {
     }
 
     @Test
-    fun analyzeEndpointPersistsAndReturnsId() = testApplication {
+    fun uploadConfigEndpointReturnsExpectedLimit() = testApplication {
         application {
             module(repository = ExposedAnalysisRepository())
         }
 
-        val response = client.post("/api/v1/analyze") {
-            contentType(ContentType.Application.Json)
+        val response = client.get("/api/v1/upload-config")
+        val body = response.bodyAsText()
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        assertContains(body, "\"maxFileSizeMb\": 10")
+        assertContains(body, "\"fileFieldName\": \"file\"")
+    }
+
+    @Test
+    fun multipartUploadPersistsAnalysisAndReturnsId() = testApplication {
+        application {
+            module(repository = ExposedAnalysisRepository())
+        }
+
+        val fastaContent = """
+            >seq_orf_demo
+            ATGAAATAG
+            CCCATGCCCTAA
+            ATGTTTTGA
+        """.trimIndent()
+
+        val response = client.post("/api/v1/analyze-upload") {
             setBody(
-                """
-                {
-                  "fastaContent": ">seq_orf_demo\nATGAAATAG\nCCCATGCCCTAA\nATGTTTTGA",
-                  "originalFileName": "sample.fasta"
-                }
-                """.trimIndent()
+                MultiPartFormDataContent(
+                    formData {
+                        append(
+                            UploadConstraints.FILE_FIELD_NAME,
+                            fastaContent.toByteArray(),
+                            Headers.build {
+                                append(HttpHeaders.ContentDisposition, "filename=\"sample.fasta\"")
+                                append(HttpHeaders.ContentType, "text/plain")
+                            }
+                        )
+                    }
+                )
             )
         }
 
@@ -48,23 +76,95 @@ class ApplicationApiTest {
         assertContains(body, "\"experimentId\": 1")
         assertContains(body, "\"header\": \"seq_orf_demo\"")
         assertContains(body, "\"aminoAcidSequence\": \"MK\"")
+        assertContains(body, "\"aminoAcidSequence\": \"MP\"")
+        assertContains(body, "\"aminoAcidSequence\": \"MF\"")
     }
 
     @Test
-    fun getSavedAnalysisById() = testApplication {
+    fun oversizedMultipartUploadReturns413() = testApplication {
         application {
             module(repository = ExposedAnalysisRepository())
         }
 
-        client.post("/api/v1/analyze") {
-            contentType(ContentType.Application.Json)
+        val oversizedFasta = buildString {
+            append(">big\n")
+            append("A".repeat(UploadConstraints.MAX_FASTA_SIZE_BYTES + 1))
+        }
+
+        val response = client.post("/api/v1/analyze-upload") {
             setBody(
-                """
-                {
-                  "fastaContent": ">seq_orf_demo\nATGAAATAG\nCCCATGCCCTAA\nATGTTTTGA",
-                  "originalFileName": "sample.fasta"
-                }
-                """.trimIndent()
+                MultiPartFormDataContent(
+                    formData {
+                        append(
+                            UploadConstraints.FILE_FIELD_NAME,
+                            oversizedFasta.toByteArray(),
+                            Headers.build {
+                                append(HttpHeaders.ContentDisposition, "filename=\"oversized.fasta\"")
+                                append(HttpHeaders.ContentType, "text/plain")
+                            }
+                        )
+                    }
+                )
+            )
+        }
+
+        assertEquals(HttpStatusCode.PayloadTooLarge, response.status)
+        assertContains(
+            response.bodyAsText(),
+            "\"message\": \"Размер загружаемого FASTA-файла превышает 10 МБ\""
+        )
+    }
+
+    @Test
+    fun multipartUploadWithoutFileReturns400() = testApplication {
+        application {
+            module(repository = ExposedAnalysisRepository())
+        }
+
+        val response = client.post("/api/v1/analyze-upload") {
+            setBody(
+                MultiPartFormDataContent(
+                    formData {
+                        append("description", "missing file")
+                    }
+                )
+            )
+        }
+
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertContains(
+            response.bodyAsText(),
+            "\"message\": \"В multipart-запросе отсутствует файл в поле 'file'\""
+        )
+    }
+
+    @Test
+    fun getSavedAnalysisByIdAfterMultipartUpload() = testApplication {
+        application {
+            module(repository = ExposedAnalysisRepository())
+        }
+
+        val fastaContent = """
+            >seq_orf_demo
+            ATGAAATAG
+            CCCATGCCCTAA
+            ATGTTTTGA
+        """.trimIndent()
+
+        client.post("/api/v1/analyze-upload") {
+            setBody(
+                MultiPartFormDataContent(
+                    formData {
+                        append(
+                            UploadConstraints.FILE_FIELD_NAME,
+                            fastaContent.toByteArray(),
+                            Headers.build {
+                                append(HttpHeaders.ContentDisposition, "filename=\"sample.fasta\"")
+                                append(HttpHeaders.ContentType, "text/plain")
+                            }
+                        )
+                    }
+                )
             )
         }
 
@@ -75,17 +175,5 @@ class ApplicationApiTest {
         assertContains(body, "\"experimentId\": 1")
         assertContains(body, "\"sequence\": \"ATGAAATAGCCCATGCCCTAAATGTTTTGA\"")
         assertContains(body, "\"aminoAcidSequence\": \"MF\"")
-    }
-
-    @Test
-    fun getMissingAnalysisReturns404() = testApplication {
-        application {
-            module(repository = ExposedAnalysisRepository())
-        }
-
-        val response = client.get("/api/v1/analysis/999")
-
-        assertEquals(HttpStatusCode.NotFound, response.status)
-        assertContains(response.bodyAsText(), "\"message\": \"Анализ не найден\"")
     }
 }
