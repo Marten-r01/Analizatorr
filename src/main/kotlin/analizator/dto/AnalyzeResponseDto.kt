@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AnalyzeResponseDto(
+    val experimentId: Int,
     val header: String,
     val sequence: String,
     val stats: SequenceStatsDto,
