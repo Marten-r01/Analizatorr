@@ -97,6 +97,15 @@ fun Application.module(repository: AnalysisRepository = createProductionReposito
                 )
             }
 
+            get("/analyses") {
+                val limit = call.request.queryParameters["limit"]?.toIntOrNull() ?: 10
+                require(limit in 1..100) { "limit должен быть в диапазоне от 1 до 100" }
+
+                call.respond(
+                    analysisService.getLatest(limit).map { it.toDto() }
+                )
+            }
+
             post("/analyze") {
                 val request = call.receive<AnalyzeRequestDto>()
                 val report = analysisService.analyzeAndSave(

@@ -27,4 +27,8 @@ class SequenceAnalysisService(
     fun getByExperimentId(experimentId: Int): SequenceReport? {
         return repository.findByExperimentId(experimentId)
     }
+
+    fun getLatest(limit: Int): List<AnalysisSummary> {
+        return repository.findLatest(limit)
+    }
 }

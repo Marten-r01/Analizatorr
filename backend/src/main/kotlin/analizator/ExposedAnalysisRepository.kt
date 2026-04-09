@@ -112,4 +112,43 @@ class ExposedAnalysisRepository : AnalysisRepository {
             )
         }
     }
+
+    override fun findLatest(limit: Int): List<AnalysisSummary> {
+        require(limit > 0) { "limit должен быть больше 0" }
+
+        return transaction {
+            val experimentRows = ExperimentsTable
+                .selectAll()
+                .orderBy(ExperimentsTable.createdAtEpochMs to SortOrder.DESC)
+                .limit(limit)
+                .toList()
+
+            experimentRows.mapNotNull { experimentRow ->
+                val experimentId = experimentRow[ExperimentsTable.id].value
+
+                val sequenceRow = SequencesTable
+                    .selectAll()
+                    .where { SequencesTable.experimentId eq experimentId }
+                    .singleOrNull()
+                    ?: return@mapNotNull null
+
+                val sequenceId = sequenceRow[SequencesTable.id].value
+
+                val orfCount = OrfsTable
+                    .selectAll()
+                    .where { OrfsTable.sequenceId eq sequenceId }
+                    .count()
+                    .toInt()
+
+                AnalysisSummary(
+                    experimentId = experimentId,
+                    header = sequenceRow[SequencesTable.header],
+                    sequenceLength = sequenceRow[SequencesTable.length],
+                    gcPercent = sequenceRow[SequencesTable.gcContent],
+                    orfCount = orfCount,
+                    createdAtEpochMs = experimentRow[ExperimentsTable.createdAtEpochMs]
+                )
+            }
+        }
+    }
 }

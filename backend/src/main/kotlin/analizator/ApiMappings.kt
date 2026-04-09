@@ -1,5 +1,6 @@
 package analizator
 
+import analizator.dto.AnalysisSummaryDto
 import analizator.dto.AnalyzeResponseDto
 import analizator.dto.OrfDto
 import analizator.dto.ProteinDto
@@ -35,5 +36,16 @@ fun SequenceReport.toDto(): AnalyzeResponseDto {
                 aminoAcidSequence = it.aminoAcidSequence
             )
         }
+    )
+}
+
+fun AnalysisSummary.toDto(): AnalysisSummaryDto {
+    return AnalysisSummaryDto(
+        experimentId = experimentId,
+        header = header,
+        sequenceLength = sequenceLength,
+        gcPercent = gcPercent,
+        orfCount = orfCount,
+        createdAtEpochMs = createdAtEpochMs
     )
 }
