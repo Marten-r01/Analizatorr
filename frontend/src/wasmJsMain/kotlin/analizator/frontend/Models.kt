@@ -66,5 +66,5 @@ data class AnalysisSummaryDto(
 data class SelectedFile(
     val file: File,
     val name: String,
-    val sizeBytes: Long
+    val sizeBytes: Int
 )

@@ -1,3 +1,5 @@
+@file:OptIn(kotlin.js.ExperimentalWasmJsInterop::class)
+
 package analizator.frontend
 
 import kotlinx.browser.window
@@ -15,15 +17,15 @@ object ApiClient {
     }
 
     suspend fun getUploadConfig(baseUrl: String): UploadConfigResponseDto {
-        val response = window.fetch("$baseUrl/api/v1/upload-config").await()
-        return decode(response)
+        val response: Response = window.fetch("$baseUrl/api/v1/upload-config").await()
+        return decode<UploadConfigResponseDto>(response)
     }
 
     suspend fun uploadFasta(baseUrl: String, file: File): AnalyzeResponseDto {
         val formData = FormData()
         formData.append("file", file, file.name)
 
-        val response = window.fetch(
+        val response: Response = window.fetch(
             "$baseUrl/api/v1/analyze-upload",
             RequestInit(
                 method = "POST",
@@ -31,25 +33,26 @@ object ApiClient {
             )
         ).await()
 
-        return decode(response)
+        return decode<AnalyzeResponseDto>(response)
     }
 
     suspend fun getAnalysisById(baseUrl: String, experimentId: Int): AnalyzeResponseDto {
-        val response = window.fetch("$baseUrl/api/v1/analysis/$experimentId").await()
-        return decode(response)
+        val response: Response = window.fetch("$baseUrl/api/v1/analysis/$experimentId").await()
+        return decode<AnalyzeResponseDto>(response)
     }
 
     suspend fun getLatestAnalyses(baseUrl: String, limit: Int): List<AnalysisSummaryDto> {
-        val response = window.fetch("$baseUrl/api/v1/analyses?limit=$limit").await()
-        return decode(response)
+        val response: Response = window.fetch("$baseUrl/api/v1/analyses?limit=$limit").await()
+        return decode<List<AnalysisSummaryDto>>(response)
     }
 
-    suspend inline fun <reified T> decode(response: Response): T {
-        val text = response.text().await()
-        if (!response.ok) {
+    private suspend inline fun <reified T> decode(response: Response): T {
+        val text = response.text().await<String>()
+        val isSuccessful = response.status.toInt() in 200..299
+        if (!isSuccessful) {
             throw IllegalStateException(extractErrorMessage(text))
         }
-        return json.decodeFromString(text)
+        return json.decodeFromString<T>(text)
     }
 
     private fun extractErrorMessage(text: String): String {

@@ -1,8 +1,10 @@
+@file:OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+
 plugins {
-    kotlin("multiplatform") version "2.3.20"
-    id("org.jetbrains.compose") version "1.7.3"
-    id("org.jetbrains.kotlin.plugin.compose") version "2.3.20"
-    kotlin("plugin.serialization") version "2.3.20"
+    kotlin("multiplatform")
+    id("org.jetbrains.compose")
+    id("org.jetbrains.kotlin.plugin.compose")
+    kotlin("plugin.serialization")
 }
 
 repositories {
@@ -12,7 +14,7 @@ repositories {
 
 kotlin {
     wasmJs {
-        moduleName = "frontend"
+        outputModuleName.set("frontend")
         browser()
         binaries.executable()
     }

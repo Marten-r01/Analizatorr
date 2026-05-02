@@ -14,7 +14,9 @@ class MultipartFastaExtractor(
         val multipartData = call.receiveMultipart(formFieldLimit = maxFileSizeBytes.toLong())
         var uploadedFasta: UploadedFasta? = null
 
-        multipartData.forEachPart { part ->
+        while (true) {
+            val part = multipartData.readPart() ?: break
+
             when (part) {
                 is PartData.FileItem -> {
                     if (part.name == UploadConstraints.FILE_FIELD_NAME && uploadedFasta == null) {
@@ -34,8 +36,6 @@ class MultipartFastaExtractor(
 
                 else -> Unit
             }
-
-            part.dispose()
         }
 
         return requireNotNull(uploadedFasta) {

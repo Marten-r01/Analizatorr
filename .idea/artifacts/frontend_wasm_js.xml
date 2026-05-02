@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="frontend-wasm-js">
+    <output-path>$PROJECT_DIR$/frontend/build/libs</output-path>
+    <root id="archive" name="frontend-wasm-js.jar">
+      <element id="module-output" name="analizator.frontend.wasmJsMain" />
+    </root>
+  </artifact>
+</component>

@@ -1,7 +1,7 @@
 plugins {
-    kotlin("jvm") version "2.3.20"
+    kotlin("jvm")
     application
-    kotlin("plugin.serialization") version "2.3.20"
+    kotlin("plugin.serialization")
 }
 
 repositories {
@@ -20,6 +20,7 @@ dependencies {
     implementation("io.ktor:ktor-server-status-pages-jvm:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktorVersion")
     implementation("ch.qos.logback:logback-classic:1.5.18")
+    implementation("io.ktor:ktor-server-cors-jvm:${ktorVersion}")
 
     implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")

@@ -6,12 +6,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -82,9 +82,11 @@ fun App() {
                 refreshHistory()
             }
 
-            val selectedFileTooLarge = selectedFile != null &&
-                    uploadConfig != null &&
-                    selectedFile!!.sizeBytes > uploadConfig!!.maxFileSizeBytes.toLong()
+            val selectedFileTooLarge = selectedFile?.let { file ->
+                uploadConfig?.let { config ->
+                    file.sizeBytes > config.maxFileSizeBytes.toLong()
+                }
+            } ?: false
 
             Column(
                 modifier = Modifier
@@ -141,10 +143,10 @@ fun App() {
 
                     Text("Текущий backend: $backendUrl")
 
-                    if (uploadConfig != null) {
-                        Text("Лимит файла: ${uploadConfig!!.maxFileSizeMb} МБ")
-                        Text("Поле multipart: ${uploadConfig!!.fileFieldName}")
-                        Text("Тип запроса: ${uploadConfig!!.acceptedRequestContentType}")
+                    uploadConfig?.let { config ->
+                        Text("Лимит файла: ${config.maxFileSizeMb} МБ")
+                        Text("Поле multipart: ${config.fileFieldName}")
+                        Text("Тип запроса: ${config.acceptedRequestContentType}")
                     }
                 }
 
@@ -157,8 +159,7 @@ fun App() {
                                         SelectedFile(
                                             file = it,
                                             name = it.name,
-                                            sizeBytes = it.size.toLong()
-                                        )
+                                            sizeBytes = it.size.toInt()                                    )
                                     }
                                     infoMessage = null
                                     errorMessage = null
@@ -211,8 +212,9 @@ fun App() {
                     if (selectedFile == null) {
                         Text("Файл не выбран")
                     } else {
-                        Text("Имя файла: ${selectedFile!!.name}")
-                        Text("Размер файла: ${formatBytes(selectedFile!!.sizeBytes)}")
+                        val file = requireNotNull(selectedFile)
+                        Text("Имя файла: ${file.name}")
+                        Text("Размер файла: ${formatBytes(file.sizeBytes)}")
                     }
 
                     if (selectedFileTooLarge) {
@@ -301,24 +303,24 @@ fun App() {
                     }
                 )
 
-                if (infoMessage != null) {
+                infoMessage?.let { message ->
                     MessageCard(
                         title = "Статус",
-                        text = infoMessage!!,
+                        text = message,
                         isError = false
                     )
                 }
 
-                if (errorMessage != null) {
+                errorMessage?.let { message ->
                     MessageCard(
                         title = "Ошибка",
-                        text = errorMessage!!,
+                        text = message,
                         isError = true
                     )
                 }
 
-                if (report != null) {
-                    ReportCard(report = report!!)
+                report?.let { currentReport ->
+                    ReportCard(report = currentReport)
                 }
             }
         }
@@ -326,7 +328,7 @@ fun App() {
 }
 
 @Composable
-private fun SectionCard(
+fun SectionCard(
     title: String,
     content: @Composable () -> Unit
 ) {
@@ -406,7 +408,6 @@ private fun HistoryCard(
                         Text("GC=${formatDouble(item.gcPercent)}%")
                         Text("ORFs=${item.orfCount}")
                         Text("createdAt=${item.createdAtEpochMs}")
-
                         Button(
                             onClick = { onOpen(item) }
                         ) {
@@ -416,5 +417,19 @@ private fun HistoryCard(
                 }
             }
         }
+    }
+}
+private fun normalizeBackendUrl(url: String): String {
+    return url.trim().removeSuffix("/")
+}
+
+private fun formatBytes(bytes: Int): String {
+    val kb = 1024.0
+    val mb = kb * 1024.0
+
+    return when {
+        bytes >= mb -> "${formatDouble(bytes / mb)} MB"
+        bytes >= kb -> "${formatDouble(bytes / kb)} KB"
+        else -> "$bytes B"
     }
 }
