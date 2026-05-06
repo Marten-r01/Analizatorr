@@ -2,14 +2,23 @@
 
 package analizator.frontend
 
+import analizator.dto.AnalysisSummaryDto
+import analizator.dto.AnalyzeResponseDto
+import analizator.dto.ErrorResponseDto
+import analizator.dto.UploadConfigResponseDto
 import kotlinx.browser.window
 import kotlinx.coroutines.await
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import kotlin.js.JsString
 import org.w3c.fetch.RequestInit
 import org.w3c.fetch.Response
 import org.w3c.files.File
 import org.w3c.xhr.FormData
+
+@Suppress("UNUSED_PARAMETER")
+private fun postFormDataRequestInit(body: FormData): RequestInit =
+    js("({ method: 'POST', body: body })")
 
 object ApiClient {
     private val json = Json {
@@ -27,10 +36,7 @@ object ApiClient {
 
         val response: Response = window.fetch(
             "$baseUrl/api/v1/analyze-upload",
-            RequestInit(
-                method = "POST",
-                body = formData
-            )
+            postFormDataRequestInit(formData)
         ).await()
 
         return decode<AnalyzeResponseDto>(response)
@@ -47,7 +53,7 @@ object ApiClient {
     }
 
     private suspend inline fun <reified T> decode(response: Response): T {
-        val text = response.text().await<String>()
+        val text = response.text().await<JsString>().toString()
         val isSuccessful = response.status.toInt() in 200..299
         if (!isSuccessful) {
             throw IllegalStateException(extractErrorMessage(text))

@@ -9,9 +9,12 @@ fun pickSingleFastaFile(onSelected: (File?) -> Unit) {
     input.type = "file"
     input.accept = ".fasta,.fa,.fna,.txt"
     input.multiple = false
+    input.setAttribute("style", "display: none")
     input.onchange = {
         onSelected(input.files?.item(0))
+        input.parentNode?.removeChild(input)
         null
     }
+    document.body?.appendChild(input)
     input.click()
 }

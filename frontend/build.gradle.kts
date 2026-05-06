@@ -1,5 +1,7 @@
 @file:OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
 
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
+
 plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose")
@@ -15,13 +17,20 @@ repositories {
 kotlin {
     wasmJs {
         outputModuleName.set("frontend")
-        browser()
+        browser {
+            commonWebpackConfig {
+                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
+                    port = 8081
+                }
+            }
+        }
         binaries.executable()
     }
 
     sourceSets {
         val wasmJsMain by getting {
             dependencies {
+                implementation(project(":api-contract"))
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material3)

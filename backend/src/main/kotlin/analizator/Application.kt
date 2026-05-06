@@ -5,6 +5,8 @@ import analizator.dto.ErrorResponseDto
 import analizator.dto.HealthResponseDto
 import analizator.dto.UploadConfigResponseDto
 import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
@@ -13,6 +15,7 @@ import io.ktor.server.application.install
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.request.contentType
 import io.ktor.server.request.receive
@@ -23,9 +26,6 @@ import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import kotlinx.serialization.json.Json
 import java.io.IOException
-//import io.ktor.server.plugins.cors.routing.CORS
-//import io.ktor.http.HttpHeaders
-//import io.ktor.http.HttpMethod
 
 fun main() {
     embeddedServer(
@@ -37,6 +37,7 @@ fun main() {
 }
 
 fun Application.module(repository: AnalysisRepository = createProductionRepository()) {
+
     val analysisService = SequenceAnalysisService(
         parser = FastaParser(FastaValidator()),
         gcAnalyzer = GcAnalyzer(),
@@ -48,6 +49,17 @@ fun Application.module(repository: AnalysisRepository = createProductionReposito
     val multipartFastaExtractor = MultipartFastaExtractor(
         maxFileSizeBytes = UploadConstraints.MAX_FASTA_SIZE_BYTES
     )
+
+    install(CORS) {
+        anyHost()
+        allowMethod(HttpMethod.Get)
+        allowMethod(HttpMethod.Post)
+        allowMethod(HttpMethod.Options)
+        allowHeader(HttpHeaders.ContentType)
+        allowHeader(HttpHeaders.Accept)
+        allowHeader(HttpHeaders.Authorization)
+        allowNonSimpleContentTypes = true
+    }
 
     install(ContentNegotiation) {
         json(
@@ -84,11 +96,13 @@ fun Application.module(repository: AnalysisRepository = createProductionReposito
     }
 
     routing {
+
         get("/health") {
             call.respond(HealthResponseDto(status = "UP"))
         }
 
         route("/api/v1") {
+
             get("/upload-config") {
                 call.respond(
                     UploadConfigResponseDto(
@@ -102,7 +116,7 @@ fun Application.module(repository: AnalysisRepository = createProductionReposito
 
             get("/analyses") {
                 val limit = call.request.queryParameters["limit"]?.toIntOrNull() ?: 10
-                require(limit in 1..100) { "limit должен быть в диапазоне от 1 до 100" }
+                require(limit in 1..100)
 
                 call.respond(
                     analysisService.getLatest(limit).map { it.toDto() }
@@ -119,11 +133,10 @@ fun Application.module(repository: AnalysisRepository = createProductionReposito
             }
 
             post("/analyze-upload") {
-                require(call.request.contentType().match(ContentType.MultiPart.FormData)) {
-                    "Ожидается Content-Type: multipart/form-data"
-                }
+                require(call.request.contentType().match(ContentType.MultiPart.FormData))
 
                 val uploadedFasta = multipartFastaExtractor.extract(call)
+
                 val report = analysisService.analyzeAndSave(
                     lines = uploadedFasta.content.lineSequence().toList(),
                     originalFileName = uploadedFasta.originalFileName
@@ -137,6 +150,7 @@ fun Application.module(repository: AnalysisRepository = createProductionReposito
                     ?: throw IllegalArgumentException("Некорректный id анализа")
 
                 val report = analysisService.getByExperimentId(id)
+
                 if (report == null) {
                     call.respond(
                         HttpStatusCode.NotFound,

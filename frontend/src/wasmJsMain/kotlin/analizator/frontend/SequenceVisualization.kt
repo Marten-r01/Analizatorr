@@ -1,5 +1,7 @@
 package analizator.frontend
 
+import analizator.dto.OrfDto
+import analizator.dto.SequenceStatsDto
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

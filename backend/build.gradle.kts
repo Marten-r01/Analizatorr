@@ -14,13 +14,15 @@ val postgresVersion = "42.7.5"
 val h2Version = "2.3.232"
 
 dependencies {
+    implementation(project(":api-contract"))
+
     implementation("io.ktor:ktor-server-core-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-content-negotiation-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-status-pages-jvm:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktorVersion")
     implementation("ch.qos.logback:logback-classic:1.5.18")
-    implementation("io.ktor:ktor-server-cors-jvm:${ktorVersion}")
+    implementation("io.ktor:ktor-server-cors-jvm:$ktorVersion")
 
     implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
