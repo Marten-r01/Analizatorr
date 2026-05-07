@@ -511,7 +511,7 @@ private fun AnalysisScreen(
 
         if (selectedFileTooLarge) {
             Text(
-                text = "Файл превышает допустимый лимит ${uploadConfig?.maxFileSizeMb ?: 10} МБ",
+                text = "Файл превышает допустимый лимит ${uploadConfig?.maxFileSizeMb ?: 600} МБ",
                 color = MaterialTheme.colorScheme.error
             )
         }

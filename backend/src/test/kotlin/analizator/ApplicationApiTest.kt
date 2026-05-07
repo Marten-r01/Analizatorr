@@ -13,6 +13,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import io.ktor.client.statement.bodyAsText
 
 class ApplicationApiTest {
@@ -85,6 +86,46 @@ class ApplicationApiTest {
         assertContains(body, "\"header\": \"seq_two\"")
         assertContains(body, "\"experimentId\": 1")
         assertContains(body, "\"header\": \"seq_one\"")
+    }
+
+    @Test
+    fun analyzeUploadUsesOnlyFirstFastaRecord() = testApplication {
+        application {
+            module(repository = ExposedAnalysisRepository())
+        }
+
+        val fasta = """
+            >first
+            ATNNGC
+            >second
+            CCCCCCCC
+        """.trimIndent()
+
+        val response = client.post("/api/v1/analyze-upload") {
+            setBody(
+                MultiPartFormDataContent(
+                    formData {
+                        append(
+                            UploadConstraints.FILE_FIELD_NAME,
+                            fasta.toByteArray(),
+                            Headers.build {
+                                append(HttpHeaders.ContentDisposition, "filename=\"multi.fasta\"")
+                                append(HttpHeaders.ContentType, "text/plain")
+                            }
+                        )
+                    }
+                )
+            )
+        }
+
+        val body = response.bodyAsText()
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        assertContains(body, "\"header\": \"first\"")
+        assertContains(body, "\"sequence\": \"ATGC\"")
+        assertContains(body, "\"length\": 4")
+        assertFalse(body.contains("second"))
+        assertFalse(body.contains("CCCCCCCC"))
     }
 
     @Test

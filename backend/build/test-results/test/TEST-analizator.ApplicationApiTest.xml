@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="analizator.ApplicationApiTest" tests="3" skipped="0" failures="1" errors="0" timestamp="2026-05-06T19:40:30" hostname="raya-HN-WX9X" time="2.845">
+  <properties/>
+  <testcase name="latestAnalysesEndpointRejectsInvalidLimit()" classname="analizator.ApplicationApiTest" time="2.421">
+    <failure message="org.opentest4j.AssertionFailedError: Expected the char sequence to contain the substring.&#10;CharSequence &lt;{&#10;    &quot;message&quot;: &quot;Failed requirement.&quot;&#10;}&gt;, substring &lt;&quot;message&quot;: &quot;limit должен быть в диапазоне от 1 до 100&quot;&gt;, ignoreCase &lt;false&gt;." type="org.opentest4j.AssertionFailedError">org.opentest4j.AssertionFailedError: Expected the char sequence to contain the substring.
+CharSequence &lt;{
+    &quot;message&quot;: &quot;Failed requirement.&quot;
+}&gt;, substring &lt;&quot;message&quot;: &quot;limit должен быть в диапазоне от 1 до 100&quot;&gt;, ignoreCase &lt;false&gt;.
+	at app//kotlin.test.junit5.JUnit5Asserter.fail(JUnitSupport.kt:56)
+	at app//kotlin.test.Asserter.assertTrue(Assertions.kt:766)
+	at app//kotlin.test.junit5.JUnit5Asserter.assertTrue(JUnitSupport.kt:30)
+	at app//kotlin.test.AssertionsKt__AssertionsKt.assertContains(Assertions.kt:343)
+	at app//kotlin.test.AssertionsKt.assertContains(Unknown Source)
+	at app//kotlin.test.AssertionsKt__AssertionsKt.assertContains$default(Assertions.kt:342)
+	at app//kotlin.test.AssertionsKt.assertContains$default(Unknown Source)
+	at app//analizator.ApplicationApiTest$latestAnalysesEndpointRejectsInvalidLimit$1.invokeSuspend(ApplicationApiTest.kt:140)
+	at app//kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at app//kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at app//kotlinx.coroutines.internal.LimitedDispatcher$Worker.run(LimitedDispatcher.kt:124)
+	at app//kotlinx.coroutines.scheduling.TaskImpl.run(Tasks.kt:89)
+	at app//kotlinx.coroutines.scheduling.CoroutineScheduler.runSafely(CoroutineScheduler.kt:586)
+	at app//kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.executeTask(CoroutineScheduler.kt:829)
+	at app//kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.runWorker(CoroutineScheduler.kt:717)
+	at app//kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.run(CoroutineScheduler.kt:704)
+</failure>
+  </testcase>
+  <testcase name="analyzeUploadUsesOnlyFirstFastaRecord()" classname="analizator.ApplicationApiTest" time="0.238"/>
+  <testcase name="latestAnalysesEndpointReturnsSavedItems()" classname="analizator.ApplicationApiTest" time="0.182"/>
+  <system-out><![CDATA[22:40:31.475 [Test worker] DEBUG Exposed -- DROP TABLE IF EXISTS PROTEINS
+22:40:31.485 [Test worker] DEBUG Exposed -- DROP TABLE IF EXISTS ORFS
+22:40:31.486 [Test worker] DEBUG Exposed -- DROP TABLE IF EXISTS SEQUENCES
+22:40:31.487 [Test worker] DEBUG Exposed -- DROP TABLE IF EXISTS EXPERIMENTS
+22:40:31.535 [Test worker] DEBUG Exposed -- CREATE TABLE IF NOT EXISTS EXPERIMENTS (ID SERIAL PRIMARY KEY, ORIGINAL_FILE_NAME VARCHAR(255) NULL, STATUS VARCHAR(32) NOT NULL, CREATED_AT_EPOCH_MS BIGINT NOT NULL)
+22:40:31.562 [Test worker] DEBUG Exposed -- CREATE TABLE IF NOT EXISTS SEQUENCES (ID SERIAL PRIMARY KEY, EXPERIMENT_ID INT NOT NULL, HEADER VARCHAR(512) NOT NULL, RAW_SEQUENCE TEXT NOT NULL, NORMALIZED_SEQUENCE TEXT NOT NULL, "length" INT NOT NULL, GC_CONTENT DOUBLE PRECISION NOT NULL, CONSTRAINT FK_SEQUENCES_EXPERIMENT_ID__ID FOREIGN KEY (EXPERIMENT_ID) REFERENCES EXPERIMENTS(ID) ON DELETE RESTRICT ON UPDATE RESTRICT)
+22:40:31.568 [Test worker] DEBUG Exposed -- CREATE TABLE IF NOT EXISTS ORFS (ID SERIAL PRIMARY KEY, SEQUENCE_ID INT NOT NULL, FRAME INT NOT NULL, START_POS INT NOT NULL, END_POS INT NOT NULL, "length" INT NOT NULL, "sequence" TEXT NOT NULL, CONSTRAINT FK_ORFS_SEQUENCE_ID__ID FOREIGN KEY (SEQUENCE_ID) REFERENCES SEQUENCES(ID) ON DELETE RESTRICT ON UPDATE RESTRICT)
+22:40:31.575 [Test worker] DEBUG Exposed -- CREATE TABLE IF NOT EXISTS PROTEINS (ID SERIAL PRIMARY KEY, ORF_ID INT NOT NULL, AMINO_ACID_SEQUENCE TEXT NOT NULL, CONSTRAINT FK_PROTEINS_ORF_ID__ID FOREIGN KEY (ORF_ID) REFERENCES ORFS(ID) ON DELETE RESTRICT ON UPDATE RESTRICT)
+22:40:32.150 [DefaultDispatcher-worker-2 @call-context#3] INFO io.ktor.test -- No ktor.deployment.watch patterns specified, automatic reload is not active.
+22:40:32.277 [DefaultDispatcher-worker-2 @call-context#3] INFO io.ktor.test -- Application started in 0.152 seconds.
+22:40:32.280 [DefaultDispatcher-worker-1 @coroutine#5] INFO io.ktor.test -- Responding at http://localhost:80
+22:40:32.280 [DefaultDispatcher-worker-1 @coroutine#5] INFO io.ktor.test -- Responding at https://localhost:443
+22:40:32.560 [Test worker] DEBUG Exposed -- DROP TABLE IF EXISTS PROTEINS
+22:40:32.563 [Test worker] DEBUG Exposed -- DROP TABLE IF EXISTS ORFS
+22:40:32.566 [Test worker] DEBUG Exposed -- DROP TABLE IF EXISTS SEQUENCES
+22:40:32.569 [Test worker] DEBUG Exposed -- DROP TABLE IF EXISTS EXPERIMENTS
+22:40:32.578 [Test worker] DEBUG Exposed -- CREATE TABLE IF NOT EXISTS EXPERIMENTS (ID SERIAL PRIMARY KEY, ORIGINAL_FILE_NAME VARCHAR(255) NULL, STATUS VARCHAR(32) NOT NULL, CREATED_AT_EPOCH_MS BIGINT NOT NULL)
+22:40:32.585 [Test worker] DEBUG Exposed -- CREATE TABLE IF NOT EXISTS SEQUENCES (ID SERIAL PRIMARY KEY, EXPERIMENT_ID INT NOT NULL, HEADER VARCHAR(512) NOT NULL, RAW_SEQUENCE TEXT NOT NULL, NORMALIZED_SEQUENCE TEXT NOT NULL, "length" INT NOT NULL, GC_CONTENT DOUBLE PRECISION NOT NULL, CONSTRAINT FK_SEQUENCES_EXPERIMENT_ID__ID FOREIGN KEY (EXPERIMENT_ID) REFERENCES EXPERIMENTS(ID) ON DELETE RESTRICT ON UPDATE RESTRICT)
+22:40:32.591 [Test worker] DEBUG Exposed -- CREATE TABLE IF NOT EXISTS ORFS (ID SERIAL PRIMARY KEY, SEQUENCE_ID INT NOT NULL, FRAME INT NOT NULL, START_POS INT NOT NULL, END_POS INT NOT NULL, "length" INT NOT NULL, "sequence" TEXT NOT NULL, CONSTRAINT FK_ORFS_SEQUENCE_ID__ID FOREIGN KEY (SEQUENCE_ID) REFERENCES SEQUENCES(ID) ON DELETE RESTRICT ON UPDATE RESTRICT)
+22:40:32.597 [Test worker] DEBUG Exposed -- CREATE TABLE IF NOT EXISTS PROTEINS (ID SERIAL PRIMARY KEY, ORF_ID INT NOT NULL, AMINO_ACID_SEQUENCE TEXT NOT NULL, CONSTRAINT FK_PROTEINS_ORF_ID__ID FOREIGN KEY (ORF_ID) REFERENCES ORFS(ID) ON DELETE RESTRICT ON UPDATE RESTRICT)
+22:40:32.629 [DefaultDispatcher-worker-1 @call-context#14] INFO io.ktor.test -- No ktor.deployment.watch patterns specified, automatic reload is not active.
+22:40:32.632 [DefaultDispatcher-worker-1 @call-context#14] INFO io.ktor.test -- Application started in 0.004 seconds.
+22:40:32.633 [DefaultDispatcher-worker-4 @coroutine#16] INFO io.ktor.test -- Responding at http://localhost:80
+22:40:32.633 [DefaultDispatcher-worker-4 @coroutine#16] INFO io.ktor.test -- Responding at https://localhost:443
+22:40:32.743 [DefaultDispatcher-worker-1 @request#14] DEBUG Exposed -- INSERT INTO EXPERIMENTS (ORIGINAL_FILE_NAME, STATUS, CREATED_AT_EPOCH_MS) VALUES ('multi.fasta', 'COMPLETED', 1778096432721)
+22:40:32.755 [DefaultDispatcher-worker-1 @request#14] DEBUG Exposed -- INSERT INTO SEQUENCES (EXPERIMENT_ID, HEADER, RAW_SEQUENCE, NORMALIZED_SEQUENCE, "length", GC_CONTENT) VALUES (1, 'first', 'ATGC', 'ATGC', 4, 50.0)
+22:40:32.796 [Test worker] DEBUG Exposed -- DROP TABLE IF EXISTS PROTEINS
+22:40:32.799 [Test worker] DEBUG Exposed -- DROP TABLE IF EXISTS ORFS
+22:40:32.802 [Test worker] DEBUG Exposed -- DROP TABLE IF EXISTS SEQUENCES
+22:40:32.804 [Test worker] DEBUG Exposed -- DROP TABLE IF EXISTS EXPERIMENTS
+22:40:32.809 [Test worker] DEBUG Exposed -- CREATE TABLE IF NOT EXISTS EXPERIMENTS (ID SERIAL PRIMARY KEY, ORIGINAL_FILE_NAME VARCHAR(255) NULL, STATUS VARCHAR(32) NOT NULL, CREATED_AT_EPOCH_MS BIGINT NOT NULL)
+22:40:32.815 [Test worker] DEBUG Exposed -- CREATE TABLE IF NOT EXISTS SEQUENCES (ID SERIAL PRIMARY KEY, EXPERIMENT_ID INT NOT NULL, HEADER VARCHAR(512) NOT NULL, RAW_SEQUENCE TEXT NOT NULL, NORMALIZED_SEQUENCE TEXT NOT NULL, "length" INT NOT NULL, GC_CONTENT DOUBLE PRECISION NOT NULL, CONSTRAINT FK_SEQUENCES_EXPERIMENT_ID__ID FOREIGN KEY (EXPERIMENT_ID) REFERENCES EXPERIMENTS(ID) ON DELETE RESTRICT ON UPDATE RESTRICT)
+22:40:32.820 [Test worker] DEBUG Exposed -- CREATE TABLE IF NOT EXISTS ORFS (ID SERIAL PRIMARY KEY, SEQUENCE_ID INT NOT NULL, FRAME INT NOT NULL, START_POS INT NOT NULL, END_POS INT NOT NULL, "length" INT NOT NULL, "sequence" TEXT NOT NULL, CONSTRAINT FK_ORFS_SEQUENCE_ID__ID FOREIGN KEY (SEQUENCE_ID) REFERENCES SEQUENCES(ID) ON DELETE RESTRICT ON UPDATE RESTRICT)
+22:40:32.826 [Test worker] DEBUG Exposed -- CREATE TABLE IF NOT EXISTS PROTEINS (ID SERIAL PRIMARY KEY, ORF_ID INT NOT NULL, AMINO_ACID_SEQUENCE TEXT NOT NULL, CONSTRAINT FK_PROTEINS_ORF_ID__ID FOREIGN KEY (ORF_ID) REFERENCES ORFS(ID) ON DELETE RESTRICT ON UPDATE RESTRICT)
+22:40:32.838 [DefaultDispatcher-worker-4 @call-context#32] INFO io.ktor.test -- No ktor.deployment.watch patterns specified, automatic reload is not active.
+22:40:32.843 [DefaultDispatcher-worker-4 @call-context#32] INFO io.ktor.test -- Application started in 0.006 seconds.
+22:40:32.844 [DefaultDispatcher-worker-1 @coroutine#34] INFO io.ktor.test -- Responding at http://localhost:80
+22:40:32.844 [DefaultDispatcher-worker-1 @coroutine#34] INFO io.ktor.test -- Responding at https://localhost:443
+22:40:32.861 [DefaultDispatcher-worker-5 @request#32] DEBUG Exposed -- INSERT INTO EXPERIMENTS (ORIGINAL_FILE_NAME, STATUS, CREATED_AT_EPOCH_MS) VALUES ('one.fasta', 'COMPLETED', 1778096432858)
+22:40:32.865 [DefaultDispatcher-worker-5 @request#32] DEBUG Exposed -- INSERT INTO SEQUENCES (EXPERIMENT_ID, HEADER, RAW_SEQUENCE, NORMALIZED_SEQUENCE, "length", GC_CONTENT) VALUES (1, 'seq_one', 'ATGAAATAG', 'ATGAAATAG', 9, 22.22)
+22:40:32.870 [DefaultDispatcher-worker-5 @request#32] DEBUG Exposed -- INSERT INTO ORFS (SEQUENCE_ID, FRAME, START_POS, END_POS, "length", "sequence") VALUES (1, 0, 1, 9, 9, 'ATGAAATAG')
+22:40:32.875 [DefaultDispatcher-worker-5 @request#32] DEBUG Exposed -- INSERT INTO PROTEINS (ORF_ID, AMINO_ACID_SEQUENCE) VALUES (1, 'MK')
+22:40:32.895 [DefaultDispatcher-worker-3 @request#47] DEBUG Exposed -- INSERT INTO EXPERIMENTS (ORIGINAL_FILE_NAME, STATUS, CREATED_AT_EPOCH_MS) VALUES ('two.fasta', 'COMPLETED', 1778096432892)
+22:40:32.898 [DefaultDispatcher-worker-3 @request#47] DEBUG Exposed -- INSERT INTO SEQUENCES (EXPERIMENT_ID, HEADER, RAW_SEQUENCE, NORMALIZED_SEQUENCE, "length", GC_CONTENT) VALUES (2, 'seq_two', 'ATGCCCTAA', 'ATGCCCTAA', 9, 44.44)
+22:40:32.902 [DefaultDispatcher-worker-3 @request#47] DEBUG Exposed -- INSERT INTO ORFS (SEQUENCE_ID, FRAME, START_POS, END_POS, "length", "sequence") VALUES (2, 0, 1, 9, 9, 'ATGCCCTAA')
+22:40:32.904 [DefaultDispatcher-worker-3 @request#47] DEBUG Exposed -- INSERT INTO PROTEINS (ORF_ID, AMINO_ACID_SEQUENCE) VALUES (2, 'MP')
+22:40:32.925 [DefaultDispatcher-worker-5 @request#57] DEBUG Exposed -- SELECT EXPERIMENTS.ID, EXPERIMENTS.ORIGINAL_FILE_NAME, EXPERIMENTS.STATUS, EXPERIMENTS.CREATED_AT_EPOCH_MS FROM EXPERIMENTS ORDER BY EXPERIMENTS.CREATED_AT_EPOCH_MS DESC LIMIT 10
+22:40:32.934 [DefaultDispatcher-worker-5 @request#57] DEBUG Exposed -- SELECT SEQUENCES.ID, SEQUENCES.EXPERIMENT_ID, SEQUENCES.HEADER, SEQUENCES.RAW_SEQUENCE, SEQUENCES.NORMALIZED_SEQUENCE, SEQUENCES."length", SEQUENCES.GC_CONTENT FROM SEQUENCES WHERE SEQUENCES.EXPERIMENT_ID = 2
+22:40:32.942 [DefaultDispatcher-worker-5 @request#57] DEBUG Exposed -- SELECT COUNT(*) FROM ORFS WHERE ORFS.SEQUENCE_ID = 2
+22:40:32.945 [DefaultDispatcher-worker-5 @request#57] DEBUG Exposed -- SELECT SEQUENCES.ID, SEQUENCES.EXPERIMENT_ID, SEQUENCES.HEADER, SEQUENCES.RAW_SEQUENCE, SEQUENCES.NORMALIZED_SEQUENCE, SEQUENCES."length", SEQUENCES.GC_CONTENT FROM SEQUENCES WHERE SEQUENCES.EXPERIMENT_ID = 1
+22:40:32.947 [DefaultDispatcher-worker-5 @request#57] DEBUG Exposed -- SELECT COUNT(*) FROM ORFS WHERE ORFS.SEQUENCE_ID = 1
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

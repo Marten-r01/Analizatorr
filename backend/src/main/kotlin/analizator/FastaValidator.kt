@@ -6,7 +6,6 @@ class FastaValidator {
     fun validateStructure(lines: List<String>) {
         require(lines.isNotEmpty()) { "Файл пустой" }
         require(lines.first().startsWith(">")) { "FASTA-заголовок должен начинаться с символа '>'" }
-        require(lines.count { it.startsWith(">") } == 1) { "На 4 неделе поддерживается только одна FASTA-запись" }
     }
 
     fun validateHeader(header: String) {

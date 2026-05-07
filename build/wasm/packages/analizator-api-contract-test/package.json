@@ -1,0 +1,10 @@
+{
+  "name": "analizator-api-contract-test",
+  "version": "0.0.0-unspecified",
+  "main": "kotlin/analizator-api-contract-test.mjs",
+  "devDependencies": {},
+  "dependencies": {},
+  "peerDependencies": {},
+  "optionalDependencies": {},
+  "bundledDependencies": []
+}

@@ -1,0 +1,10 @@
+{
+  "name": "analizator-api-contract",
+  "version": "0.0.0-unspecified",
+  "main": "analizator-api-contract.mjs",
+  "devDependencies": {},
+  "dependencies": {},
+  "peerDependencies": {},
+  "optionalDependencies": {},
+  "bundledDependencies": []
+}

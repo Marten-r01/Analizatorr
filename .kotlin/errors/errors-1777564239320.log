@@ -1,0 +1,40 @@
+kotlin version: 2.3.20
+error message: org.jetbrains.kotlin.backend.common.CompilationException: Back-end: Please report this problem https://kotl.in/issue
+/mnt/agent/work/22b92203f00747e0/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/SearchBar.kt:-1:-1
+Details: Internal error in file lowering: java.lang.OutOfMemoryError: GC overhead limit exceeded
+	at java.base/java.util.Arrays.copyOf(Arrays.java:3537)
+	at java.base/java.lang.AbstractStringBuilder.ensureCapacityInternal(AbstractStringBuilder.java:228)
+	at java.base/java.lang.AbstractStringBuilder.append(AbstractStringBuilder.java:582)
+	at java.base/java.lang.StringBuilder.append(StringBuilder.java:179)
+	at java.base/java.lang.StringBuilder.append(StringBuilder.java:91)
+	at java.base/java.lang.AbstractStringBuilder.append(AbstractStringBuilder.java:622)
+	at java.base/java.lang.StringBuilder.append(StringBuilder.java:209)
+	at java.base/java.lang.StringBuilder.append(StringBuilder.java:91)
+	at org.jetbrains.kotlin.utils.Printer.append(Printer.kt:39)
+	at org.jetbrains.kotlin.utils.Printer.printWithNoIndent(Printer.kt:76)
+	at org.jetbrains.kotlin.ir.util.KotlinLikeDumper.visitConst(dumpKotlinLike.kt:1470)
+	at org.jetbrains.kotlin.ir.util.KotlinLikeDumper.visitConst(dumpKotlinLike.kt:189)
+	at org.jetbrains.kotlin.ir.expressions.IrConst.accept(IrConst.kt:22)
+	at org.jetbrains.kotlin.ir.util.KotlinLikeDumper.printMemberAccessExpressionWithNoIndent(dumpKotlinLike.kt:1247)
+	at org.jetbrains.kotlin.ir.util.KotlinLikeDumper.printMemberAccessExpressionWithNoIndent$default(dumpKotlinLike.kt:1150)
+	at org.jetbrains.kotlin.ir.util.KotlinLikeDumper.visitCall(dumpKotlinLike.kt:1131)
+	at org.jetbrains.kotlin.ir.util.KotlinLikeDumper.visitCall(dumpKotlinLike.kt:189)
+	at org.jetbrains.kotlin.ir.expressions.IrCall.accept(IrCall.kt:24)
+	at org.jetbrains.kotlin.ir.util.KotlinLikeDumper.printStatementContainer(dumpKotlinLike.kt:1114)
+	at org.jetbrains.kotlin.ir.util.KotlinLikeDumper.printStatementContainer$default(dumpKotlinLike.kt:1102)
+	at org.jetbrains.kotlin.ir.util.KotlinLikeDumper.visitBlockBody$lambda$0(dumpKotlinLike.kt:1076)
+	at org.jetbrains.kotlin.ir.util.KotlinLikeDumper$$Lambda$2704/0x00007d01a0b78440.invoke(Unknown Source)
+	at org.jetbrains.kotlin.ir.util.KotlinLikeDumper.printBody(dumpKotlinLike.kt:1063)
+	at org.jetbrains.kotlin.ir.util.KotlinLikeDumper.visitBlockBody(dumpKotlinLike.kt:1075)
+	at org.jetbrains.kotlin.ir.util.KotlinLikeDumper.visitBlockBody(dumpKotlinLike.kt:189)
+	at org.jetbrains.kotlin.ir.expressions.IrBlockBody.accept(IrBlockBody.kt:20)
+	at org.jetbrains.kotlin.ir.util.KotlinLikeDumper.printSimpleFunction(dumpKotlinLike.kt:758)
+	at org.jetbrains.kotlin.ir.util.KotlinLikeDumper.printSimpleFunction$default(dumpKotlinLike.kt:688)
+	at org.jetbrains.kotlin.ir.util.KotlinLikeDumper.visitSimpleFunction(dumpKotlinLike.kt:639)
+	at org.jetbrains.kotlin.ir.util.KotlinLikeDumper.visitSimpleFunction(dumpKotlinLike.kt:189)
+	at org.jetbrains.kotlin.ir.declarations.IrSimpleFunction.accept(IrSimpleFunction.kt:39)
+	at org.jetbrains.kotlin.ir.util.KotlinLikeDumper.visitClass(dumpKotlinLike.kt:354)
+Caused by: java.lang.OutOfMemoryError: GC overhead limit exceeded
+	... 32 more
+
+

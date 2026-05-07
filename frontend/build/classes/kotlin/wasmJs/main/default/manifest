@@ -1,0 +1,11 @@
+abi_version=2.3.0
+builtins_platform=WASM
+compiler_version=2.3.20
+ir_signature_versions=1,2
+jsOutputName=frontend
+language_features=+AllowAnyAsAnActualTypeForExpectInterface +JsAllowImplementingFunctionInterface +MultiPlatformProjects
+metadata_version=2.3.0
+serializedIrFileFingerprints=2krk2rid7dyj5.2ibjqg4o4kpb6 1shy79qb4eml2.19idwue5n1ixl 2fgzgkrq5p3hb.3ivi0sbdz2d9h qpsw5rzfdara.3i7dzusvveyyr 37kt5izfzbot2.35te934tdh0b2 1n8x8z7zz5cn0.3cjikpp0byfgt 195pxc9g9n2zz.1ooaw3a4jp72c 16jvmytu3bg6o.3firtnoh1bgol
+serializedKlibFingerprint=27dwps81bg733.36dn2qpp1spkh
+unique_name=analizator\:frontend
+wasm_targets=wasm-js

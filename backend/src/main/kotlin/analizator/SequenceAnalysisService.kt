@@ -9,6 +9,10 @@ class SequenceAnalysisService(
 ) {
     fun analyzeAndSave(lines: List<String>, originalFileName: String?): SequenceReport {
         val record = parser.parse(lines)
+        return analyzeAndSave(record, originalFileName)
+    }
+
+    fun analyzeAndSave(record: FastaRecord, originalFileName: String?): SequenceReport {
         val stats = gcAnalyzer.analyze(record.sequence)
         val orfs = orfFinder.find(record.sequence)
         val proteins = dnaTranslator.translate(orfs)

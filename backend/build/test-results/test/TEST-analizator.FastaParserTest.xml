@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="analizator.FastaParserTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-05-06T19:40:33" hostname="raya-HN-WX9X" time="0.018">
+  <properties/>
+  <testcase name="skipUnknownNucleotideNWhenBuildingSequence()" classname="analizator.FastaParserTest" time="0.001"/>
+  <testcase name="parseMultilineFastaAndUppercaseSequence()" classname="analizator.FastaParserTest" time="0.001"/>
+  <testcase name="parseOnlyFirstRecordFromMultiFasta()" classname="analizator.FastaParserTest" time="0.002"/>
+  <testcase name="failWhenSequenceContainsInvalidSymbol()" classname="analizator.FastaParserTest" time="0.008"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

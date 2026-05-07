@@ -138,7 +138,7 @@ fun Application.module(repository: AnalysisRepository = createProductionReposito
                 val uploadedFasta = multipartFastaExtractor.extract(call)
 
                 val report = analysisService.analyzeAndSave(
-                    lines = uploadedFasta.content.lineSequence().toList(),
+                    record = uploadedFasta.record,
                     originalFileName = uploadedFasta.originalFileName
                 )
 

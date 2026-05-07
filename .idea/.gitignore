@@ -1,10 +1,64 @@
-# Default ignored files
-/shelf/
-/workspace.xml
-# Ignored default folder with query files
-/queries/
-# Datasource local storage ignored files
-/dataSources/
-/dataSources.local.xml
-# Editor-based HTTP Client requests
-/httpRequests/
+# Compiled files
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+*.zip
+*.tar.gz
+*.tgz
+
+build/
+out/
+target/
+bin/
+gen/
+.gradle/
+.mvn/
+.gradletasknamecache
+
+# IntelliJ IDEA project files and settings
+.idea/
+*.iml
+*.iws
+*.ipr
+.idea_modules/
+
+**/local.properties
+**/gradle.properties.local
+.idea/.name
+
+# Kotlin
+.kotlin/
+.ksp/
+.kotlinc/
+kotlin-js-store/
+kotlin-compiler-embeddable-version.txt
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+*.swo
+*~
+.~lock.*
+
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+/gradle/wrapper/gradle-wrapper.properties? (do not ignore unless you have a local override)
+**/gradle-wrapper.properties~
+!gradle-wrapper.jar
+
+# Caches
+.cache/
+.cproject
+.idea/caches/
+.gradle/caches/
+.gradle/wrapper/gradle-wrapper.properties.bak

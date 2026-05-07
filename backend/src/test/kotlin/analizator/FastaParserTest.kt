@@ -22,6 +22,36 @@ class FastaParserTest {
     }
 
     @Test
+    fun parseOnlyFirstRecordFromMultiFasta() {
+        val lines = listOf(
+            ">first",
+            "ATGC",
+            "GGTA",
+            ">second",
+            "CCCC"
+        )
+
+        val record = parser.parse(lines)
+
+        assertEquals("first", record.header)
+        assertEquals("ATGCGGTA", record.sequence)
+    }
+
+    @Test
+    fun skipUnknownNucleotideNWhenBuildingSequence() {
+        val lines = listOf(
+            ">seq_with_n",
+            "ATNNGC",
+            "nnta"
+        )
+
+        val record = parser.parse(lines)
+
+        assertEquals("seq_with_n", record.header)
+        assertEquals("ATGCTA", record.sequence)
+    }
+
+    @Test
     fun failWhenSequenceContainsInvalidSymbol() {
         val lines = listOf(
             ">seq_1",

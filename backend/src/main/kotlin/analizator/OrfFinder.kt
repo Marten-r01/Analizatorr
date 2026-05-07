@@ -1,50 +1,69 @@
 package analizator
 
 class OrfFinder {
-    private val startCodon = "ATG"
-    private val stopCodons = setOf("TAA", "TAG", "TGA")
-
     fun find(sequence: String): List<Orf> {
         require(sequence.isNotEmpty()) { "Последовательность пустая" }
 
         val result = mutableListOf<Orf>()
 
         for (frame in 0..2) {
-            var i = frame
+            val codonCount = codonCount(sequence.length, frame)
+            if (codonCount == 0) continue
 
-            while (i <= sequence.length - 3) {
-                val codon = sequence.substring(i, i + 3)
+            val nearestStopAfter = IntArray(codonCount) { -1 }
+            var nearestStopEnd = -1
 
-                if (codon == startCodon) {
-                    var j = i + 3
+            for (codonIndex in codonCount - 1 downTo 0) {
+                val position = frame + codonIndex * 3
+                nearestStopAfter[codonIndex] = nearestStopEnd
 
-                    while (j <= sequence.length - 3) {
-                        val stopCodon = sequence.substring(j, j + 3)
+                if (isStopCodon(sequence, position)) {
+                    nearestStopEnd = position + 3
+                }
+            }
 
-                        if (stopCodon in stopCodons) {
-                            val endExclusive = j + 3
-                            val orfSequence = sequence.substring(i, endExclusive)
-
-                            result.add(
-                                Orf(
-                                    frame = frame,
-                                    start = i + 1,
-                                    end = endExclusive,
-                                    length = endExclusive - i,
-                                    sequence = orfSequence
-                                )
+            for (codonIndex in 0 until codonCount) {
+                val position = frame + codonIndex * 3
+                if (isStartCodon(sequence, position)) {
+                    val endExclusive = nearestStopAfter[codonIndex]
+                    if (endExclusive != -1) {
+                        result.add(
+                            Orf(
+                                frame = frame,
+                                start = position + 1,
+                                end = endExclusive,
+                                length = endExclusive - position,
+                                sequence = sequence.substring(position, endExclusive)
                             )
-                            break
-                        }
-
-                        j += 3
+                        )
                     }
                 }
-
-                i += 3
             }
         }
 
-        return result.sortedWith(compareBy<Orf> { it.frame }.thenBy { it.start })
+        return result
+    }
+
+    private fun codonCount(sequenceLength: Int, frame: Int): Int {
+        return if (frame > sequenceLength - 3) {
+            0
+        } else {
+            ((sequenceLength - 3 - frame) / 3) + 1
+        }
+    }
+
+    private fun isStartCodon(sequence: String, position: Int): Boolean {
+        return sequence[position] == 'A' &&
+            sequence[position + 1] == 'T' &&
+            sequence[position + 2] == 'G'
+    }
+
+    private fun isStopCodon(sequence: String, position: Int): Boolean {
+        return sequence[position] == 'T' &&
+            (
+                sequence[position + 1] == 'A' && sequence[position + 2] == 'A' ||
+                    sequence[position + 1] == 'A' && sequence[position + 2] == 'G' ||
+                    sequence[position + 1] == 'G' && sequence[position + 2] == 'A'
+                )
     }
 }

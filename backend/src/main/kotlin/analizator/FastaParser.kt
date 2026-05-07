@@ -11,10 +11,19 @@ class FastaParser(
         validator.validateStructure(normalizedLines)
 
         val header = normalizedLines.first().removePrefix(">").trim()
-        val sequence = normalizedLines
-            .drop(1)
-            .joinToString(separator = "")
-            .uppercase()
+        val sequence = buildString {
+            normalizedLines
+                .drop(1)
+                .takeWhile { !it.startsWith(">") }
+                .forEach { line ->
+                    line.forEach { nucleotide ->
+                        val normalized = nucleotide.uppercaseChar()
+                        if (normalized != 'N') {
+                            append(normalized)
+                        }
+                    }
+                }
+        }
 
         validator.validateHeader(header)
         validator.validateSequence(sequence)
